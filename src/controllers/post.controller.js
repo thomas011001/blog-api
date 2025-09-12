@@ -12,6 +12,7 @@ import {
   createComment,
   getPostComments,
 } from "../services/comments.service.js";
+import { addLike, deleteLike } from "../services/like.service.js";
 
 async function getAllPostsController(req, res, next) {
   const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -150,7 +151,29 @@ async function addCommentController(req, res, next) {
   }
 }
 
+async function addLikeController(req, res, next) {
+  const [postId, userId] = [req.params.id, req.user.id];
+
+  try {
+    const data = addLike(postId, userId);
+    return res.json({ success: true, data, message: "Added Like." });
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function removeLikeController(req, res, next) {
+  const [postId, userId] = [req.params.id, req.user.id];
+  try {
+    const data = deleteLike(postId, userId);
+    return res.json({ success: true, data, message: "Deleted Like." });
+  } catch (e) {
+    next(e);
+  }
+}
+
 export {
+  removeLikeController,
   addCommentController,
   getPostCommentsController,
   deletePostController,
@@ -158,4 +181,5 @@ export {
   createPostController,
   getPostController,
   patchPostController,
+  addLikeController,
 };
