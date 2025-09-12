@@ -3,13 +3,16 @@ import cors from "cors";
 import express from "express";
 import authRouter from "./routes/auth.route.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
+import userRouter from "./routes/user.route.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use("", authRouter);
+
+app.use("/", authRouter);
+app.use("/users", userRouter);
 
 app.use(globalErrorHandler);
 
