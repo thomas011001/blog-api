@@ -65,7 +65,7 @@ async function getPostController(req, res, next) {
   }
 }
 
-async function patchPostController(req, res) {
+async function patchPostController(req, res, next) {
   const errros = validationResult(req);
   if (!errros.isEmpty()) {
     return next(
