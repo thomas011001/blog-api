@@ -4,6 +4,7 @@ import express from "express";
 import authRouter from "./routes/auth.route.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import userRouter from "./routes/user.route.js";
+import postRouter from "./routes/post.route.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cors());
 
 app.use("/", authRouter);
 app.use("/users", userRouter);
+app.use("/posts", postRouter);
 
 app.use(globalErrorHandler);
 
