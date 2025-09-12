@@ -16,7 +16,8 @@ const createPostValidator = [
   body("isPublished")
     .optional()
     .isBoolean()
-    .withMessage("isPublished must be boolean value"),
+    .withMessage("isPublished must be boolean value")
+    .toBoolean(),
 ];
 
 export { createPostValidator };

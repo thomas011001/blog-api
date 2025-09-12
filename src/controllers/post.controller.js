@@ -8,6 +8,10 @@ import {
 } from "../services/post.service.js";
 import ValidationError from "../errors/valdiationError.js";
 import ForbiddenError from "../errors/ForbiddenError.js";
+import {
+  createComment,
+  getPostComments,
+} from "../services/comments.service.js";
 
 async function getAllPostsController(req, res, next) {
   const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -105,7 +109,50 @@ async function deletePostController(req, res, next) {
   }
 }
 
+async function getPostCommentsController(req, res, next) {
+  const { id } = req.params;
+  try {
+    const data = await getPostComments(id);
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function addCommentController(req, res, next) {
+  const errros = validationResult(req);
+  if (!errros.isEmpty()) {
+    return next(
+      new ValidationError(
+        errros
+          .array()
+          .map((error) => error.msg)
+          .join(" | ")
+      )
+    );
+  }
+
+  const [id, userId, body] = [req.params.id, req.user.id, req.body];
+
+  const post = await getPost(id);
+  if (!post.isPublished) {
+    return next(new ForbiddenError("You can't add comment to this post"));
+  }
+
+  try {
+    const data = await createComment(id, userId, body);
+    return res.json({ success: true, message: "Post Created", data });
+  } catch (e) {
+    next(e);
+  }
+}
+
 export {
+  addCommentController,
+  getPostCommentsController,
   deletePostController,
   getAllPostsController,
   createPostController,

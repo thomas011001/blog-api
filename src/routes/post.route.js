@@ -5,19 +5,31 @@ import {
   getPostController,
   patchPostController,
   deletePostController,
+  getPostCommentsController,
+  addCommentController,
 } from "../controllers/post.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
 import { createPostValidator } from "../validators/postValidator.js";
+import { createCommentValidator } from "../validators/commentValidator.js";
 
 const postRouter = express.Router();
 
-// GET /posts/:id/comments
+// DELETE /:id/comments
+
+// POST /:id/likes
+// DELETE /:id/likes
 
 postRouter.get("/", getAllPostsController);
 postRouter.post("/", createPostValidator, verifyToken, createPostController);
 postRouter.get("/:id", getPostController);
 postRouter.patch("/:id", createPostValidator, verifyToken, patchPostController);
 postRouter.delete("/:id", verifyToken, deletePostController);
-postRouter.get("/:id/comments", getPostCommentsController);
+postRouter.get(
+  "/:id/comments",
+  createCommentValidator,
+  getPostCommentsController
+);
+
+postRouter.post("/:id/comments", verifyToken, addCommentController);
 
 export default postRouter;

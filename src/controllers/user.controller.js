@@ -7,6 +7,7 @@ import {
   getUserById,
 } from "../services/user.service.js";
 import { getUserPosts } from "../services/post.service.js";
+import ValidationError from "../errors/valdiationError.js";
 
 async function getAllUsersController(req, res, next) {
   const page = Math.max(1, parseInt(req.query.page) || 1);

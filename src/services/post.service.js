@@ -131,6 +131,7 @@ async function createPost(data, authorId) {
       },
     });
   } catch (e) {
+    console.log(e);
     if (e.code === "P2025") {
       throw new NotFoundError("User not found");
     }
