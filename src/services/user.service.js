@@ -1,6 +1,45 @@
 import prisma from "../config/prisma.js";
 import ConflictError from "../errors/conflictError.js";
-import InternalServerError from "../errors/nternalServerError.js";
+import InternalServerError from "../errors/InternalServerError.js";
+import paginate from "../utils/paginate.js";
+import NotFoundError from "../errors/notFoundError.js";
+
+async function getAllUsers(
+  page = 1,
+  limit = 10,
+  q = "",
+  sortBy = "createdAt",
+  sortOrder = "desc"
+) {
+  const where = q
+    ? {
+        OR: [{ username: { contains: q, mode: "insensitive" } }],
+      }
+    : {};
+
+  const orderBy = { [sortBy]: sortOrder };
+
+  const data = await paginate(prisma.user, {
+    limit,
+    page,
+    where,
+    orderBy,
+    select: {
+      id: true,
+      username: true,
+      createdAt: true,
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
+          posts: true,
+        },
+      },
+    },
+  });
+
+  return data;
+}
 
 async function createUser(data) {
   try {
@@ -15,15 +54,36 @@ async function createUser(data) {
 
 async function getUserById(id) {
   try {
-    return await prisma.user.findUnique({ where: { id } });
-  } catch {
+    return await prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        createdAt: true,
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+            posts: true,
+          },
+        },
+      },
+    });
+  } catch (e) {
+    if (e.code === "P2025") {
+      throw new NotFoundError("User not found");
+    }
     throw new InternalServerError();
   }
 }
 
 async function getUserByUsername(username) {
   try {
-    return await prisma.user.findUnique({ where: { username } });
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) {
+      throw new NotFoundError("User Not Found");
+    }
+    return user;
   } catch {
     throw new InternalServerError();
   }
@@ -55,4 +115,11 @@ async function editUser(data, id) {
   }
 }
 
-export { createUser, deleteUser, getUserByUsername, getUserById, editUser };
+export {
+  createUser,
+  deleteUser,
+  getUserByUsername,
+  getUserById,
+  editUser,
+  getAllUsers,
+};
