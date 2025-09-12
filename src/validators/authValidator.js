@@ -21,7 +21,7 @@ const signupValidator = [
 
 const loginValidator = [
   body("username").notEmpty().withMessage("Username is required."),
-  body("Password").notEmpty().withMessage("Password is required."),
+  body("password").notEmpty().withMessage("Password is required."),
 ];
 
 export { signupValidator, loginValidator };
