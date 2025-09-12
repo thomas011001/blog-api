@@ -96,8 +96,18 @@ async function getUserPostsController(req, res, next) {
   const sortBy = req.query.sortBy || "createdAt";
   const sortOrder = req.query.sortOrder === "asc" ? "asc" : "desc";
 
+  const isAuthor = req.user ? id == req.user.id : false;
+
   try {
-    const data = await getUserPosts(id, page, limit, search, sortBy, sortOrder);
+    const data = await getUserPosts(
+      id,
+      page,
+      limit,
+      search,
+      sortBy,
+      sortOrder,
+      isAuthor
+    );
     return res.json({
       success: true,
       data,
