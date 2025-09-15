@@ -13,6 +13,7 @@ model User {
   username  String    @unique @db.VarChar(50)
   password  String
   isAuthor  Boolean   @default(false)
+  avatarUrl String    @default("https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg")
   createdAt DateTime  @default(now())
   comments  Comment[]
   likes     Like[]
@@ -25,6 +26,7 @@ model Post {
   text        String
   authorId    String
   isPublished Boolean   @default(false)
+  photoUrl    String    @default("https://media.sproutsocial.com/uploads/2022/05/How-to-post-on-instagram-from-pc.jpg")
   createdAt   DateTime  @default(now())
   comments    Comment[]
   likes       Like[]
