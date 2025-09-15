@@ -63,8 +63,8 @@ async function patchUserController(req, res, next) {
   }
 
   try {
-    await editUser(req.body, id);
-    res.json({ success: true, message: "Edited User" });
+    const data = await editUser(req.body, id);
+    res.json({ success: true, message: "Edited User", data });
   } catch (e) {
     return next(e);
   }

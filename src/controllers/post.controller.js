@@ -63,7 +63,7 @@ async function createPostController(req, res, next) {
 async function getPostController(req, res, next) {
   const { id } = req.params;
   try {
-    const data = await getPost(id);
+    const data = await getPost(id, req.user);
     return res.json({ success: true, data });
   } catch (e) {
     next(e);
@@ -83,11 +83,18 @@ async function patchPostController(req, res, next) {
     );
   }
 
-  const [id, data] = [req.params.id, req.body];
+  const [id, body, userId] = [req.params.id, req.body, req.user.id];
 
   try {
-    const post = await editPost(id, data);
-    return res.json({ success: true, message: "Edited Post", data: post });
+    const post = await getPost(id, req.user);
+    if (post.author.id != userId) {
+      throw new ForbiddenError(
+        "You do not have permission to perform this action."
+      );
+    }
+
+    const data = await editPost(id, body);
+    return res.json({ success: true, message: "Edited Post", data });
   } catch (e) {
     next(e);
   }
@@ -138,7 +145,7 @@ async function addCommentController(req, res, next) {
 
   const [id, userId, body] = [req.params.id, req.user.id, req.body];
 
-  const post = await getPost(id);
+  const post = await getPost(id, req.user);
   if (!post.isPublished) {
     return next(new ForbiddenError("You can't add comment to this post"));
   }
@@ -155,8 +162,8 @@ async function addLikeController(req, res, next) {
   const [postId, userId] = [req.params.id, req.user.id];
 
   try {
-    const data = addLike(postId, userId);
-    return res.json({ success: true, data, message: "Added Like." });
+    await addLike(postId, userId);
+    return res.json({ success: true, message: "Added Like." });
   } catch (e) {
     next(e);
   }
@@ -165,8 +172,8 @@ async function addLikeController(req, res, next) {
 async function removeLikeController(req, res, next) {
   const [postId, userId] = [req.params.id, req.user.id];
   try {
-    const data = deleteLike(postId, userId);
-    return res.json({ success: true, data, message: "Deleted Like." });
+    await deleteLike(postId, userId);
+    return res.json({ success: true, message: "Deleted Like." });
   } catch (e) {
     next(e);
   }

@@ -6,7 +6,6 @@ import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import userRouter from "./routes/user.route.js";
 import postRouter from "./routes/post.route.js";
 import morgan from "morgan";
-import apicache from "apicache";
 
 const app = express();
 
@@ -15,7 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(morgan("dev"));
-app.use(apicache.middleware("5 minutes"));
 
 app.use("/", authRouter);
 app.use("/users", userRouter);

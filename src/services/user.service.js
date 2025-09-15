@@ -84,7 +84,10 @@ async function getUserByUsername(username) {
       throw new NotFoundError("User Not Found");
     }
     return user;
-  } catch {
+  } catch (e) {
+    if (e instanceof NotFoundError) {
+      throw e;
+    }
     throw new InternalServerError();
   }
 }
@@ -106,6 +109,18 @@ async function editUser(data, id) {
     return await prisma.user.update({
       where: { id },
       data,
+      select: {
+        id: true,
+        username: true,
+        createdAt: true,
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+            posts: true,
+          },
+        },
+      },
     });
   } catch (e) {
     if (e.code === "P2025") {

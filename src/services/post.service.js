@@ -139,9 +139,9 @@ async function createPost(data, authorId) {
   }
 }
 
-async function getPost(id) {
+async function getPost(id, user) {
   try {
-    return await prisma.post.findUnique({
+    const post = await prisma.post.findUniqueOrThrow({
       where: { id },
       select: {
         id: true,
@@ -163,9 +163,18 @@ async function getPost(id) {
         },
       },
     });
+    if (post.isPublished) {
+      return post;
+    } else if (post.author.id === user.id) {
+      return post;
+    } else {
+      throw new NotFoundError("Post Not Found");
+    }
   } catch (e) {
     if (e.code === "P2025") {
-      throw new NotFoundError("Post not found");
+      throw new NotFoundError("Post not Found");
+    } else if (e instanceof NotFoundError) {
+      throw e;
     }
     throw new InternalServerError();
   }
@@ -176,8 +185,28 @@ async function editPost(id, data) {
     return await prisma.post.update({
       where: { id },
       data,
+      select: {
+        id: true,
+        title: true,
+        text: true,
+        createdAt: true,
+        isPublished: true,
+        author: {
+          select: {
+            username: true,
+            id: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          },
+        },
+      },
     });
   } catch (e) {
+    console.log(e);
     if (e.code === "P2025") {
       throw new NotFoundError("Post not found");
     }

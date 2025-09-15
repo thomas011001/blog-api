@@ -11,15 +11,19 @@ import {
   removeLikeController,
 } from "../controllers/post.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
-import { createPostValidator } from "../validators/postValidator.js";
+import {
+  createPostValidator,
+  patchPostValidator,
+} from "../validators/postValidator.js";
 import { createCommentValidator } from "../validators/commentValidator.js";
+import softVerifyToken from "../middleware/softVerifyToken.js";
 
 const postRouter = express.Router();
 
 postRouter.get("/", getAllPostsController);
 postRouter.post("/", createPostValidator, verifyToken, createPostController);
-postRouter.get("/:id", getPostController);
-postRouter.patch("/:id", createPostValidator, verifyToken, patchPostController);
+postRouter.get("/:id", softVerifyToken, getPostController);
+postRouter.patch("/:id", patchPostValidator, verifyToken, patchPostController);
 postRouter.delete("/:id", verifyToken, deletePostController);
 postRouter.get(
   "/:id/comments",
@@ -27,7 +31,12 @@ postRouter.get(
   getPostCommentsController
 );
 
-postRouter.post("/:id/comments", verifyToken, addCommentController);
+postRouter.post(
+  "/:id/comments",
+  createCommentValidator,
+  verifyToken,
+  addCommentController
+);
 
 postRouter.post("/:id/likes", verifyToken, addLikeController);
 postRouter.delete("/:id/likes", verifyToken, removeLikeController);

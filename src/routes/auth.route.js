@@ -10,13 +10,18 @@ const authRouter = Router();
 const loginLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 5,
-  message: "Too many login attempts, please try again after a minute.",
+  handler: (req, res, next, options) => {
+    return res.status(options.statusCode).json({
+      success: false,
+      error: "Too many login attempts, please try again after a minute.",
+    });
+  },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 authRouter.post("/signup", signupValidator, signup);
-authRouter.post("/login", loginValidator, loginLimiter, login);
+authRouter.post("/login", loginLimiter, loginValidator, login);
 authRouter.post("/logout", logout);
 
 export default authRouter;

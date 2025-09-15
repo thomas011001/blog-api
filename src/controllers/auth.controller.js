@@ -76,7 +76,7 @@ function logout(req, res) {
     httpOnly: true,
     sameSite: "strict",
   });
-  return res.json({ msg: "logged out" });
+  return res.json({ success: true, message: "logged out" });
 }
 
 export { signup, login, logout };
