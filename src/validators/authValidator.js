@@ -17,6 +17,12 @@ const signupValidator = [
       minUppercase: 0,
     })
     .withMessage("Weak password"),
+  body("avatarUrl")
+    .optional()
+    .notEmpty()
+    .withMessage("avatar url cant be empty")
+    .isURL()
+    .withMessage("the avatar url must be valide url"),
 ];
 
 const loginValidator = [

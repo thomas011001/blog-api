@@ -19,6 +19,10 @@ const createPostValidator = [
     .isBoolean()
     .withMessage("isPublished must be boolean value")
     .toBoolean(),
+  body("photoUrl")
+    .optional()
+    .isURL()
+    .withMessage("photo url must be valide URL"),
 ];
 
 const patchPostValidator = [
@@ -41,12 +45,17 @@ const patchPostValidator = [
     .isBoolean()
     .withMessage("isPublished must be boolean value")
     .toBoolean(),
+  body("photoUrl")
+    .optional()
+    .isURL()
+    .withMessage("photo url must be valide URL"),
   body().custom((value, { req }) => {
     console.log(value, req.body);
     if (
       req.body.title === undefined &&
       req.body.text === undefined &&
-      req.body.isPublished === undefined
+      req.body.isPublished === undefined &&
+      req.body.photoUrl === undefined
     ) {
       throw new ConflictError(
         "At least one of title, text, or isPublished must be provided."
