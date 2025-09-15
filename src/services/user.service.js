@@ -30,10 +30,15 @@ async function getAllUsers(
       createdAt: true,
       _count: {
         select: {
-          likes: true,
-          comments: true,
           posts: true,
         },
+      },
+    },
+  });
+  data._count.likes = await prisma.like.count({
+    where: {
+      post: {
+        authorId: data.id,
       },
     },
   });
@@ -54,7 +59,7 @@ async function createUser(data) {
 
 async function getUserById(id) {
   try {
-    return await prisma.user.findUniqueOrThrow({
+    const data = await prisma.user.findUniqueOrThrow({
       where: { id },
       select: {
         id: true,
@@ -62,13 +67,21 @@ async function getUserById(id) {
         createdAt: true,
         _count: {
           select: {
-            likes: true,
-            comments: true,
             posts: true,
           },
         },
       },
     });
+
+    data._count.likes = await prisma.like.count({
+      where: {
+        post: {
+          authorId: id,
+        },
+      },
+    });
+
+    return data;
   } catch (e) {
     if (e.code === "P2025") {
       throw new NotFoundError("User not found");
@@ -106,7 +119,7 @@ async function deleteUser(id) {
 
 async function editUser(data, id) {
   try {
-    return await prisma.user.update({
+    const data = await prisma.user.update({
       where: { id },
       data,
       select: {
@@ -116,12 +129,20 @@ async function editUser(data, id) {
         _count: {
           select: {
             likes: true,
-            comments: true,
-            posts: true,
           },
         },
       },
     });
+
+    data._count.likes = await prisma.like.count({
+      where: {
+        post: {
+          authorId: id,
+        },
+      },
+    });
+
+    return data;
   } catch (e) {
     if (e.code === "P2025") {
       throw new NotFoundError("User not found");
