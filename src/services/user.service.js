@@ -27,6 +27,7 @@ async function getAllUsers(
     select: {
       id: true,
       username: true,
+      avatarUrl: true,
       createdAt: true,
       _count: {
         select: {
@@ -35,13 +36,12 @@ async function getAllUsers(
       },
     },
   });
-  data._count.likes = await prisma.like.count({
-    where: {
-      post: {
-        authorId: data.id,
-      },
-    },
-  });
+
+  for (const user of data.data) {
+    user._count.likes = await prisma.like.count({
+      where: { post: { authorId: user.id } },
+    });
+  }
 
   return data;
 }
@@ -64,6 +64,7 @@ async function getUserById(id) {
       select: {
         id: true,
         username: true,
+        avatarUrl: true,
         createdAt: true,
         _count: {
           select: {
@@ -124,6 +125,7 @@ async function editUser(data, id) {
       data,
       select: {
         id: true,
+        avatarUrl: true,
         username: true,
         createdAt: true,
         _count: {

@@ -40,6 +40,7 @@ async function getUserPosts(
     id: true,
     title: true,
     text: true,
+    photoUrl: true,
     createdAt: true,
     isPublished: true,
     author: {
@@ -98,6 +99,7 @@ async function getAllPosts(
     id: true,
     title: true,
     text: true,
+    photoUrl: true,
     createdAt: true,
     isPublished: true,
 
@@ -146,6 +148,7 @@ async function getPost(id, user) {
       select: {
         id: true,
         title: true,
+        photoUrl: true,
         text: true,
         createdAt: true,
         isPublished: true,
@@ -188,6 +191,7 @@ async function editPost(id, data) {
       select: {
         id: true,
         title: true,
+        photoUrl: true,
         text: true,
         createdAt: true,
         isPublished: true,

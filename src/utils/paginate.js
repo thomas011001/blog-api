@@ -4,30 +4,26 @@ async function paginate(
 ) {
   const skip = (page - 1) * limit;
 
-  try {
-    const [data, total] = await Promise.all([
-      model.findMany({
-        skip,
-        take: limit,
-        where,
-        orderBy,
-        select,
-      }),
-      model.count({ where }),
-    ]);
+  const [data, total] = await Promise.all([
+    model.findMany({
+      skip,
+      take: limit,
+      where,
+      orderBy,
+      select,
+    }),
+    model.count({ where }),
+  ]);
 
-    return {
-      data,
-      meta: {
-        totalItems: total,
-        totalPages: Math.ceil(total / limit),
-        currentPage: page,
-        perPage: limit,
-      },
-    };
-  } catch (e) {
-    throw e;
-  }
+  return {
+    data,
+    meta: {
+      totalItems: total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      perPage: limit,
+    },
+  };
 }
 
 export default paginate;
