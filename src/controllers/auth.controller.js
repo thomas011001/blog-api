@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { createUser, getUserByUsername } from "../services/user.service.js";
+import {
+  createUser,
+  getUserById,
+  getUserByUsername,
+} from "../services/user.service.js";
 import "dotenv/config";
 import { validationResult } from "express-validator";
 import ValidationError from "../errors/valdiationError.js";
@@ -65,6 +69,19 @@ async function login(req, res, next) {
       { expiresIn: "24h" }
     );
 
+    const refreshToken = jwt.sign(
+      { id: user.id, username: user.username },
+      process.env.SECRET,
+      { expiresIn: "30d" }
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
     return res.json({ success: true, data: { token } });
   } catch (e) {
     next(e);
@@ -79,4 +96,46 @@ function logout(req, res) {
   return res.json({ success: true, message: "logged out" });
 }
 
-export { signup, login, logout };
+function getUserInfo(req, res, next) {
+  try {
+    const userId = req.id;
+    const user = getUserById(userId);
+    res.json({ success: true, user });
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function refresh(req, res, next) {
+  try {
+    const token = req.cookies.refreshToken;
+    if (!token) {
+      return next(new AuthenticationError("Refresh token not found"));
+    }
+
+    // Verify refresh token
+    jwt.verify(token, process.env.REFRESH_SECRET, (err, decoded) => {
+      if (err) {
+        return next(
+          new AuthenticationError("Invalid or expired refresh token")
+        );
+      }
+
+      // Generate new access token
+      const accessToken = jwt.sign(
+        { id: decoded.id, username: decoded.username },
+        process.env.ACCESS_SECRET,
+        { expiresIn: "15m" }
+      );
+
+      return res.json({
+        success: true,
+        data: { accessToken },
+      });
+    });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export { signup, getUserInfo, login, logout, refresh };
