@@ -37,6 +37,13 @@ async function signup(req, res, next) {
     return next(e);
   }
 }
+function logout(req, res) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+  return res.json({ success: true, message: "logged out" });
+}
 
 async function login(req, res, next) {
   const errors = validationResult(req);
@@ -77,7 +84,7 @@ async function login(req, res, next) {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -88,18 +95,10 @@ async function login(req, res, next) {
   }
 }
 
-function logout(req, res) {
-  res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "strict",
-  });
-  return res.json({ success: true, message: "logged out" });
-}
-
-function getUserInfo(req, res, next) {
+async function getUserInfo(req, res, next) {
   try {
-    const userId = req.id;
-    const user = getUserById(userId);
+    const userId = req.user.id;
+    const user = await getUserById(userId);
     res.json({ success: true, user });
   } catch (e) {
     next(e);
@@ -109,12 +108,14 @@ function getUserInfo(req, res, next) {
 async function refresh(req, res, next) {
   try {
     const token = req.cookies.refreshToken;
+    console.log(req.cookies);
+    console.log(token);
     if (!token) {
       return next(new AuthenticationError("Refresh token not found"));
     }
 
     // Verify refresh token
-    jwt.verify(token, process.env.REFRESH_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
         return next(
           new AuthenticationError("Invalid or expired refresh token")
