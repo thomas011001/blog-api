@@ -38,7 +38,7 @@ async function signup(req, res, next) {
   }
 }
 function logout(req, res) {
-  res.clearCookie("token", {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     sameSite: "strict",
   });
@@ -111,10 +111,10 @@ async function refresh(req, res, next) {
     console.log(req.cookies);
     console.log(token);
     if (!token) {
+      console.log("hi");
       return next(new AuthenticationError("Refresh token not found"));
     }
 
-    // Verify refresh token
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
         return next(
@@ -122,10 +122,9 @@ async function refresh(req, res, next) {
         );
       }
 
-      // Generate new access token
       const accessToken = jwt.sign(
         { id: decoded.id, username: decoded.username },
-        process.env.ACCESS_SECRET,
+        process.env.SECRET,
         { expiresIn: "15m" }
       );
 
