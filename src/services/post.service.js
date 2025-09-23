@@ -33,12 +33,19 @@ async function getUserPosts(
           mode: "insensitive",
         },
       },
+      {
+        description: {
+          contains: q,
+          mode: "insensitive",
+        },
+      },
     ];
   }
 
   const select = {
     id: true,
     title: true,
+    description: true,
     text: true,
     photoUrl: true,
     createdAt: true,
@@ -98,6 +105,7 @@ async function getAllPosts(
   const select = {
     id: true,
     title: true,
+    description: true,
     text: true,
     photoUrl: true,
     createdAt: true,
@@ -148,6 +156,7 @@ async function getPost(id, user) {
       select: {
         id: true,
         title: true,
+        description: true,
         photoUrl: true,
         text: true,
         createdAt: true,
@@ -191,6 +200,7 @@ async function editPost(id, data) {
       select: {
         id: true,
         title: true,
+        description: true,
         photoUrl: true,
         text: true,
         createdAt: true,

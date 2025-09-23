@@ -23,13 +23,15 @@ async function signup(req, res, next) {
     );
   }
 
-  const { username, password } = req.body;
+  const { username, password, isAuthor, avatarUrl } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     await createUser({
       username,
       password: hashedPassword,
+      isAuthor,
+      avatarUrl,
     });
 
     return res.status(201).json({ message: "user created", success: true });

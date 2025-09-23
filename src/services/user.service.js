@@ -64,6 +64,7 @@ async function getUserById(id) {
       select: {
         id: true,
         username: true,
+        isAuthor: true,
         avatarUrl: true,
         createdAt: true,
         _count: {
