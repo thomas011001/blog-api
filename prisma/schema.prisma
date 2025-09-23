@@ -25,6 +25,7 @@ model Post {
   title       String    @db.VarChar(50)
   text        String
   authorId    String
+  description String    @db.VarChar(200)
   isPublished Boolean   @default(false)
   photoUrl    String    @default("https://media.sproutsocial.com/uploads/2022/05/How-to-post-on-instagram-from-pc.jpg")
   createdAt   DateTime  @default(now())
