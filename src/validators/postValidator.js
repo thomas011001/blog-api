@@ -12,8 +12,8 @@ const createPostValidator = [
     .trim()
     .notEmpty()
     .withMessage("Text is required")
-    .isLength({ max: 500 })
-    .withMessage("Text length must be under 500"),
+    .isLength({ max: 2000 })
+    .withMessage("Text length must be under 2000"),
   body("isPublished")
     .optional()
     .isBoolean()
@@ -23,6 +23,12 @@ const createPostValidator = [
     .optional()
     .isURL()
     .withMessage("photo url must be valide URL"),
+  body("description")
+    .trim()
+    .notEmpty()
+    .withMessage("Description is required")
+    .isLength({ max: 200 })
+    .withMessage("Text length must be under 200"),
 ];
 
 const patchPostValidator = [
@@ -38,8 +44,8 @@ const patchPostValidator = [
     .trim()
     .notEmpty()
     .withMessage("Text is required")
-    .isLength({ max: 500 })
-    .withMessage("Text length must be under 500"),
+    .isLength({ max: 2000 })
+    .withMessage("Text length must be under 2000"),
   body("isPublished")
     .optional()
     .isBoolean()
@@ -49,13 +55,21 @@ const patchPostValidator = [
     .optional()
     .isURL()
     .withMessage("photo url must be valide URL"),
+  body("description")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Description is required")
+    .isLength({ max: 200 })
+    .withMessage("Text length must be under 200"),
   body().custom((value, { req }) => {
     console.log(value, req.body);
     if (
       req.body.title === undefined &&
       req.body.text === undefined &&
       req.body.isPublished === undefined &&
-      req.body.photoUrl === undefined
+      req.body.photoUrl === undefined &&
+      req.body.description === undefined
     ) {
       throw new ConflictError(
         "At least one of title, text, or isPublished must be provided."

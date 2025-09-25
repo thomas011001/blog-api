@@ -98,6 +98,12 @@ async function getAllPosts(
               mode: "insensitive",
             },
           },
+          {
+            description: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
         ],
       }
     : { isPublished: true };
@@ -165,6 +171,32 @@ async function getPost(id, user) {
           select: {
             username: true,
             id: true,
+            avatarUrl: true,
+          },
+        },
+        comments: {
+          select: {
+            id: true,
+            createdAt: true,
+            user: {
+              select: {
+                username: true,
+                id: true,
+                avatarUrl: true,
+              },
+            },
+            text: true,
+          },
+        },
+        likes: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                username: true,
+                id: true,
+              },
+            },
           },
         },
         _count: {

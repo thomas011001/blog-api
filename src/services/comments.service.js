@@ -52,6 +52,7 @@ async function createComment(postId, userId, data) {
         user: {
           select: {
             id: true,
+            avatarUrl: true,
             username: true,
           },
         },
@@ -64,6 +65,23 @@ async function createComment(postId, userId, data) {
     }
     throw new InternalServerError();
   }
+}
+
+async function getComment(id) {
+  return prisma.comment.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      text: true,
+      createdAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
 }
 
 async function deleteComment(id) {
@@ -90,4 +108,4 @@ async function deleteComment(id) {
   }
 }
 
-export { getPostComments, createComment, deleteComment };
+export { getPostComments, createComment, deleteComment, getComment };

@@ -9,6 +9,7 @@ import {
   addCommentController,
   addLikeController,
   removeLikeController,
+  deleteCommentController,
 } from "../controllers/post.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
 import {
@@ -36,6 +37,11 @@ postRouter.post(
   createCommentValidator,
   verifyToken,
   addCommentController
+);
+postRouter.delete(
+  "/:id/comments/:commentId",
+  verifyToken,
+  deleteCommentController
 );
 
 postRouter.post("/:id/likes", verifyToken, addLikeController);

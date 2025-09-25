@@ -10,6 +10,8 @@ import ValidationError from "../errors/valdiationError.js";
 import ForbiddenError from "../errors/ForbiddenError.js";
 import {
   createComment,
+  deleteComment,
+  getComment,
   getPostComments,
 } from "../services/comments.service.js";
 import { addLike, deleteLike } from "../services/like.service.js";
@@ -179,6 +181,19 @@ async function removeLikeController(req, res, next) {
   }
 }
 
+async function deleteCommentController(req, res, next) {
+  try {
+    const comment = await getComment(req.params.commentId);
+    if (req.user.id !== comment.user.id) {
+      throw new ForbiddenError("Forbidden Order");
+    }
+    const data = await deleteComment(req.params.commentId);
+    res.json({ success: true, data });
+  } catch (e) {
+    next(e);
+  }
+}
+
 export {
   removeLikeController,
   addCommentController,
@@ -189,4 +204,5 @@ export {
   getPostController,
   patchPostController,
   addLikeController,
+  deleteCommentController,
 };
